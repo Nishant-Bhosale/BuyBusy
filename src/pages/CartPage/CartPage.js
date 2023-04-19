@@ -1,8 +1,7 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { doc, getDoc, updateDoc, setDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import Loader from "../../components/UI/Loader/Loader";
-import AuthContext from "../../context/Auth/AuthContext";
 import ProductList from "../../components/Product/ProductList/ProductList";
 import styles from "./CartPage.module.css";
 import { toast } from "react-toastify";
@@ -11,6 +10,8 @@ import {
   getProductsUsingProductIds,
   getUserCartProducts,
 } from "../../utils/utils";
+import { useSelector } from "react-redux";
+import { getUser } from "../../redux/reducers/authReducer";
 
 const CartPage = () => {
   const [cartProducts, setCartProducts] = useState([]);
@@ -25,7 +26,7 @@ const CartPage = () => {
     return acc + currentProduct.price * currentProduct.quantity;
   }, 0);
 
-  const { user } = useContext(AuthContext);
+  const user = useSelector(getUser);
 
   useEffect(() => {
     getCartProducts(user?.uid);

@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { db } from "../../config/firebase";
 import { getDoc, doc } from "firebase/firestore";
-import AuthContext from "../../context/Auth/AuthContext";
+import { useSelector } from "react-redux";
 import { getProductsUsingProductIds } from "../../utils/utils";
 import Loader from "../../components/UI/Loader/Loader";
 import styles from "./OrdersPage.module.css";
 import { toast } from "react-toastify";
 import OrderTable from "../../components/OrderTable/OrderTable";
+import { getUser } from "../../redux/reducers/authReducer";
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const { user } = useContext(AuthContext);
+  const user = useSelector(getUser);
 
   // Fetch user orders from firestore
   const getOrders = async () => {

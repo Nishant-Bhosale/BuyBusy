@@ -1,17 +1,29 @@
-import React, { useRef, useContext, useEffect } from "react";
-import AuthContext from "../../context/Auth/AuthContext";
+import React, { useRef, useEffect } from "react";
 import { toast } from "react-toastify";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  getError,
+  getErrorMessage,
+  getLoadingState,
+  getUser,
+} from "../../redux/reducers/authReducer";
+import { clearError, login } from "../../redux/reducers/authReducer";
 import { useNavigate } from "react-router-dom";
 import styles from "./LoginPage.module.css";
 import { NavLink } from "react-router-dom";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const emailRef = useRef();
   const passwordRef = useRef();
-  const { user, loading, error, message, login, clearError } =
-    useContext(AuthContext);
+
+  const user = useSelector(getUser);
+  const error = useSelector(getError);
+  const message = useSelector(getErrorMessage);
+  const loading = useSelector(getLoadingState);
+
   const isAuth = user;
 
   useEffect(() => {
@@ -23,7 +35,7 @@ const LoginPage = () => {
     // If some error occurs display the error
     if (error) {
       toast.error(message);
-      clearError();
+      dispatch(clearError());
     }
   }, [error, user]);
 
@@ -37,7 +49,7 @@ const LoginPage = () => {
       return toast.error("Please enter valid data!");
     }
 
-    await login(emailVal, passwordVal);
+    dispatch(login({ email: emailVal, password: passwordVal }));
   };
 
   return (

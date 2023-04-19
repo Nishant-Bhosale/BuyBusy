@@ -1,12 +1,13 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import styles from "./ProductDetails.module.css";
 import { toast } from "react-toastify";
-import AuthContext from "../../../../context/Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { updateDoc, setDoc } from "firebase/firestore";
 import MinusIcon from "../../../UI/Icons/MinusIcon";
 import PlusIcon from "../../../UI/Icons/PlusIcon";
 import { getUserCartProducts } from "../../../../utils/utils";
+import { useSelector } from "react-redux";
+import { getUser } from "../../../../redux/reducers/authReducer";
 
 const ProductDetails = ({
   title,
@@ -20,7 +21,8 @@ const ProductDetails = ({
 }) => {
   const [productAddingToCart, setProductAddingToCart] = useState(false);
   const [productRemovingFromCart, setProductRemovingCart] = useState(false);
-  const { user } = useContext(AuthContext);
+
+  const user = useSelector(getUser);
 
   const navigate = useNavigate();
 

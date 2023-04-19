@@ -1,7 +1,15 @@
-import React, { useRef, useEffect, useContext } from "react";
+import React, { useRef, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  signup,
+  clearError,
+  getUser,
+  getLoadingState,
+  getError,
+  getErrorMessage,
+} from "../../redux/reducers/authReducer";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import AuthContext from "../../context/Auth/AuthContext";
 import styles from "./RegisterPage.module.css";
 
 const RegisterPage = () => {
@@ -11,9 +19,12 @@ const RegisterPage = () => {
   const passwordRef = useRef();
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const { user, loading, error, message, signup, clearError } =
-    useContext(AuthContext);
+  const user = useSelector(getUser);
+  const loading = useSelector(getLoadingState);
+  const error = useSelector(getError);
+  const message = useSelector(getErrorMessage);
 
   const isAuth = user;
 
@@ -26,7 +37,7 @@ const RegisterPage = () => {
     // If some error occurs display the error
     if (error) {
       toast.error(message);
-      clearError();
+      dispatch(clearError());
     }
   }, [error, user, message]);
 
@@ -47,7 +58,7 @@ const RegisterPage = () => {
     }
 
     // call the signup function
-    await signup({ name: nameVal, email: emailVal, password: passwordVal });
+    dispatch(signup({ name: nameVal, email: emailVal, password: passwordVal }));
   };
 
   return (

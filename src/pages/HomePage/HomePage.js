@@ -1,9 +1,16 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./HomePage.module.css";
 import Loader from "../../components/UI/Loader/Loader";
 import ProductList from "../../components/Product/ProductList/ProductList";
-import ProductsContext from "../../context/Products/ProductsContext";
 import FilterSidebar from "../../components/FilterSidebar/FilterSidebar";
+import {
+  getAllProducts,
+  getProducts,
+  getFilteredProducts,
+  getLoadingState,
+  filterProducts,
+} from "../../redux/reducers/productsReducer";
+import { useDispatch, useSelector } from "react-redux";
 // import { getAuth } from "firebase/auth";
 // import { addDataToCollection } from "../../utils/utils";
 
@@ -17,24 +24,22 @@ function HomePage() {
     womensClothing: false,
   });
 
-  const {
-    products,
-    loading,
-    getAllProducts,
-    filteredProducts,
-    filterProducts,
-  } = useContext(ProductsContext);
+  const dispatch = useDispatch();
+
+  const products = useSelector(getProducts);
+  const filteredProducts = useSelector(getFilteredProducts);
+  const loading = useSelector(getLoadingState);
 
   // Fetch products on app mount
   useEffect(() => {
-    getAllProducts();
+    dispatch(getAllProducts());
     // addDataToCollection();
-  }, []);
+  }, [dispatch]);
 
   // Rerender the products if the search or filter parameters change
   useEffect(() => {
-    filterProducts({ priceRange, searchQuery: query, categories });
-  }, [priceRange, query, categories]);
+    dispatch(filterProducts({ priceRange, searchQuery: query, categories }));
+  }, [priceRange, query, categories, dispatch]);
 
   // Display loader while products are fetching
   if (loading) {
