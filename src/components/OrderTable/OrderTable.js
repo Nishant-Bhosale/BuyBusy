@@ -4,9 +4,10 @@ import { convertDate } from "../../utils/utils";
 
 // Component to display user order in table format
 const OrderTable = ({ order }) => {
+  if (!order.length) return;
   return (
     <div style={{ textAlign: "center", marginTop: "2rem" }}>
-      {order[0].date && <h2>Ordered On:- {convertDate(order[0].date)}</h2>}
+      {order[0]?.date && <h2>Ordered On:- {convertDate(order[0].date)}</h2>}
       <table className={styles.table}>
         <thead>
           <tr>

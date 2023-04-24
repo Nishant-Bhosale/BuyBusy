@@ -1,175 +1,72 @@
-import React, { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc, setDoc, arrayUnion } from "firebase/firestore";
-import { db } from "../../config/firebase";
+import React, { useEffect } from "react";
 import Loader from "../../components/UI/Loader/Loader";
 import ProductList from "../../components/Product/ProductList/ProductList";
 import styles from "./CartPage.module.css";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import {
-  getProductsUsingProductIds,
-  getUserCartProducts,
-} from "../../utils/utils";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getUser } from "../../redux/reducers/authReducer";
+import {
+  fetchCartProducts,
+  getCartLoadingState,
+  getCartProducts,
+  clearUserCart,
+  getPurchasingState,
+  purchaseProducts,
+} from "../../redux/reducers/cartReducer";
 
 const CartPage = () => {
-  const [cartProducts, setCartProducts] = useState([]);
-  const [cartProductsMap, setCartProductsMap] = useState([]);
-  const [purchasing, setPurchasing] = useState(false);
-  const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const cartProducts = useSelector(getCartProducts);
+  const loading = useSelector(getCartLoadingState);
+  const user = useSelector(getUser);
+  const purchasing = useSelector(getPurchasingState);
 
   // Calculate total price of the products in cart
-  let totalPrice = cartProducts.reduce((acc, currentProduct) => {
+  let totalPrice = cartProducts?.reduce((acc, currentProduct) => {
     return acc + currentProduct.price * currentProduct.quantity;
   }, 0);
 
-  const user = useSelector(getUser);
-
   useEffect(() => {
-    getCartProducts(user?.uid);
+    dispatch(fetchCartProducts({ uid: user?.uid }));
   }, []);
 
-  const purchaseProducts = async () => {
-    setPurchasing(true);
+  const purchaseProductsHandler = async () => {
     try {
-      const docRef = doc(db, "userOrders", user.uid);
-      const docSnap = await getDoc(docRef);
-      const data = docSnap.data();
-
-      // If users orders exist add one new order to the orders list
-      if (data) {
-        updateDoc(docRef, {
-          orders: arrayUnion({ ...cartProductsMap, date: Date.now() }),
-        });
-
-        // Redirect the user to orders page after successful purchase
-        clearUserCartAndRedirectToOrdersPage();
-        return;
-      }
-
-      // Create a new orders array if no orders yet
-      await setDoc(docRef, {
-        orders: [{ ...cartProductsMap, date: Date.now() }],
-      });
-
+      await dispatch(purchaseProducts({ uid: user?.uid }));
       // Redirect the user to orders page after successful purchase
       clearUserCartAndRedirectToOrdersPage();
     } catch (error) {
+      toast.error("Something went wrong!");
       console.log(error);
-    } finally {
-      setPurchasing(false);
     }
   };
 
   // Clear user cart
   const clearUserCartAndRedirectToOrdersPage = async () => {
-    const userCartRef = doc(db, "usersCarts", user.uid);
-
-    updateDoc(userCartRef, {
-      myCart: {},
-    });
-
-    setCartProducts([]);
-    setCartProductsMap({});
-
+    await dispatch(clearUserCart({ uid: user?.uid }));
     navigate("/myorders");
-  };
-
-  // Fetch user cart products
-  const getCartProducts = async (uid) => {
-    setLoading(true);
-    try {
-      const { data } = await getUserCartProducts(uid);
-
-      const { myCart: cart } = data;
-      setCartProductsMap(cart);
-
-      const productsData = await getProductsUsingProductIds(cart);
-      if (!productsData) {
-        return toast.error("No products in Cart!");
-      }
-      setCartProducts(productsData);
-    } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong!");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Remove product from cart and cart products list
-  const filterProductFromState = (productId) => {
-    delete cartProductsMap[productId];
-    setCartProducts((prevCartProducts) => {
-      return prevCartProducts.filter((product) => {
-        return product.id !== productId;
-      });
-    });
-  };
-
-  // Remove product from the database
-  const removeProductFromCart = async (productId) => {
-    try {
-      const { data, docRef } = await getUserCartProducts(user.uid);
-
-      const { myCart: cart } = data;
-
-      if (!cart[productId]) {
-        return toast.error("Product not in cart!");
-      }
-
-      delete cart[productId];
-
-      await updateDoc(docRef, {
-        myCart: {
-          ...cart,
-        },
-      });
-
-      filterProductFromState(productId);
-
-      toast.success("Product Removed Successfully!");
-    } catch (error) {
-      console.log(error);
-      toast.error(error.message);
-    }
-  };
-
-  // Update the quantity of a specific product in the UI
-  const updateProductQuantity = (type, id) => {
-    let tempCart = cartProducts.map((product) => {
-      if (product.id === id) {
-        product.quantity += type === "add" ? 1 : -1;
-      }
-      return product;
-    });
-    cartProductsMap[id] += type === "add" ? 1 : -1;
-    setCartProducts(tempCart);
   };
 
   if (loading) return <Loader />;
 
   return (
     <div className={styles.cartPageContainer}>
-      {!!cartProducts.length && (
+      {!!cartProducts?.length && (
         <aside className={styles.totalPrice}>
           <p>TotalPrice:- ₹{totalPrice}/-</p>
-          <button className={styles.purchaseBtn} onClick={purchaseProducts}>
+          <button
+            className={styles.purchaseBtn}
+            onClick={purchaseProductsHandler}
+          >
             {purchasing ? "Purchasing" : "Purchase"}
           </button>
         </aside>
       )}
-      {!!cartProducts.length ? (
-        <ProductList
-          products={cartProducts}
-          removeProductFromCart={removeProductFromCart}
-          updateProductQuantity={updateProductQuantity}
-          filterProductFromState={filterProductFromState}
-          onCart
-        />
+      {!!cartProducts?.length ? (
+        <ProductList products={cartProducts} onCart />
       ) : (
         <h1>Cart is Empty!</h1>
       )}

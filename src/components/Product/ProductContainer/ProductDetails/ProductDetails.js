@@ -6,25 +6,22 @@ import { updateDoc, setDoc } from "firebase/firestore";
 import MinusIcon from "../../../UI/Icons/MinusIcon";
 import PlusIcon from "../../../UI/Icons/PlusIcon";
 import { getUserCartProducts } from "../../../../utils/utils";
-import { useSelector } from "react-redux";
-import { getUser } from "../../../../redux/reducers/authReducer";
-
-const ProductDetails = ({
-  title,
-  price,
-  productId,
-  onCart,
-  quantity,
+import { useSelector, useDispatch } from "react-redux";
+import {
+  filterProductFromCart,
   removeProductFromCart,
   updateProductQuantity,
-  filterProductFromState,
-}) => {
+} from "../../../../redux/reducers/cartReducer";
+import { getUser } from "../../../../redux/reducers/authReducer";
+
+const ProductDetails = ({ title, price, productId, onCart, quantity }) => {
   const [productAddingToCart, setProductAddingToCart] = useState(false);
   const [productRemovingFromCart, setProductRemovingCart] = useState(false);
 
   const user = useSelector(getUser);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // Function to add product to cart
   const addProductToCart = async () => {
@@ -70,7 +67,7 @@ const ProductDetails = ({
 
   const removeProduct = async () => {
     setProductRemovingCart(true);
-    await removeProductFromCart(productId);
+    await dispatch(removeProductFromCart({ productId, uid: user.uid }));
     setProductRemovingCart(false);
   };
 
@@ -91,7 +88,7 @@ const ProductDetails = ({
           myCart: updatedCart,
         });
 
-        updateProductQuantity("add", productId);
+        dispatch(updateProductQuantity({ type: "add", id: productId }));
 
         return;
       }
@@ -122,9 +119,9 @@ const ProductDetails = ({
         });
 
         if (productCountAfterRemove === 0)
-          return filterProductFromState(productId);
+          return dispatch(filterProductFromCart({ productId }));
 
-        updateProductQuantity("remove", productId);
+        dispatch(updateProductQuantity({ type: "remove", id: productId }));
 
         return;
       }

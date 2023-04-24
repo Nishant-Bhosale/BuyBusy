@@ -10,7 +10,7 @@ const ProductImage = ({ image }) => {
         alt="Product"
         width="100%"
         height="100%"
-        style={{ objectFit: "contain" }}
+        style={{ objectFit: "contain", aspectRatio: 1 }}
       />
     </div>
   );

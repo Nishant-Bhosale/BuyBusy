@@ -41,7 +41,6 @@ export const signup = createAsyncThunk(
 );
 
 const setErrorAndResetState = (state, message) => {
-  console.log(message);
   state.user = null;
   state.error = true;
   state.message = message;

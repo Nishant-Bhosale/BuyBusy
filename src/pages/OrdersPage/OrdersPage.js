@@ -44,6 +44,7 @@ const OrdersPage = () => {
 
       // Resolve all promises and store them in the final orders array
       const finalOrders = await Promise.all(promiseArray);
+      console.log(finalOrders);
       setOrders(finalOrders);
     } catch (error) {
       console.log(error);
