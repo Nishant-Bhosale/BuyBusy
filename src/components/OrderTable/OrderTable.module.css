@@ -34,3 +34,14 @@ tr th {
   padding-left: 84.85%;
   margin-top: 10px;
 }
+
+@media screen and (max-width: 960px) {
+  .table {
+    width: 80%;
+  }
+
+  .totalPrice {
+    bottom: -4rem;
+    padding-left: 82%;
+  }
+}

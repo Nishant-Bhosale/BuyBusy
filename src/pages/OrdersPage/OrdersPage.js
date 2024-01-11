@@ -44,7 +44,6 @@ const OrdersPage = () => {
 
       // Resolve all promises and store them in the final orders array
       const finalOrders = await Promise.all(promiseArray);
-      console.log(finalOrders);
       setOrders(finalOrders);
     } catch (error) {
       console.log(error);
@@ -54,12 +53,15 @@ const OrdersPage = () => {
   };
 
   useEffect(() => {
+    if (!user) return;
     getOrders();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return <Loader />;
   }
+
+  if (!user) return null;
 
   if (!loading && !orders.length)
     return <h1 style={{ textAlign: "center" }}>No Orders Found!</h1>;

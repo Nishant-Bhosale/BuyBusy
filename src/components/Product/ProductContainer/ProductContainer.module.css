@@ -12,3 +12,10 @@
 .productContainer:hover {
   box-shadow: rgba(64, 77, 148, 0.4) 0px 2px 8px 0px;
 }
+
+@media screen and (max-width: 960px) {
+  .productContainer {
+    width: 90%;
+    margin: auto;
+  }
+}

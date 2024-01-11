@@ -4,3 +4,11 @@
   gap: 2rem;
   margin: 3rem 15rem;
 }
+
+@media screen and (max-width: 960px) {
+  .grid {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+  }
+}

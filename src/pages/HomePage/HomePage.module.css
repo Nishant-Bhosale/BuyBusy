@@ -31,3 +31,9 @@ div h2 {
   color: #224957;
   font-weight: bold;
 }
+
+@media screen and (max-width: 960px) {
+  .form {
+    width: 80%;
+  }
+}

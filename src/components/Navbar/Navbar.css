@@ -144,9 +144,12 @@
 
   .nav-links {
     text-align: center;
-    padding: 1.6rem;
+    /* padding: 1.6rem; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    display: table;
+    /* display: table; */
   }
 
   .btn-links {
@@ -182,5 +185,8 @@
   .active-links {
     color: #224957;
     background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

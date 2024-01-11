@@ -5,6 +5,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { getUser } from "../../redux/reducers/authReducer";
 import { logout } from "../../redux/reducers/authReducer";
 //Icons..
+import CloseMenu from "../../assets/close.svg";
+import HamburgerMenu from "../../assets/hamburger.svg";
 import HomeIcon from "../../assets/home.png";
 import OrdersIcon from "../../assets/basket.png";
 import SignIn from "../../assets/Log in.png";
@@ -18,6 +20,9 @@ const Navbar = () => {
   const user = useSelector(getUser);
   const isAuthenticated = user;
 
+  const handleClick = () => setClick(!click);
+  const closeMobileMenu = () => setClick(false);
+
   const scrollTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -26,6 +31,7 @@ const Navbar = () => {
   const onLogoutHandler = () => {
     scrollTop();
     dispatch(logout()); // inbuilt firebase function to logout
+    closeMobileMenu();
   };
 
   return (
@@ -37,9 +43,16 @@ const Navbar = () => {
       }}
     >
       <div className="navbar-container">
-        <NavLink to="/" className="navbar-logo" onClick={() => {}}>
+        <NavLink to="/" className="navbar-logo" onClick={closeMobileMenu}>
           Busy Buy
         </NavLink>
+        <div className="menu-icon" onClick={handleClick}>
+          <img
+            src={click ? CloseMenu : HamburgerMenu}
+            style={{ width: "35px", height: "35px", marginTop: "-20px" }}
+            alt=""
+          />
+        </div>
         <ul
           className={click ? "nav-menu active" : "nav-menu"}
           onClick={scrollTop}
@@ -49,6 +62,7 @@ const Navbar = () => {
               activeclassname="active-links"
               to="/"
               className="nav-links"
+              onClick={closeMobileMenu}
               exact="true"
             >
               <span>
@@ -69,13 +83,14 @@ const Navbar = () => {
                 <NavLink
                   activeclassname="active-links"
                   to="/myorders"
+                  onClick={closeMobileMenu}
                   className="nav-links"
                 >
                   <span>
                     <img
                       className="icon_styles"
                       src={OrdersIcon}
-                      alt="Home"
+                      alt="Orders"
                       onClick={scrollTop}
                     />
                   </span>{" "}
@@ -87,13 +102,14 @@ const Navbar = () => {
                 <NavLink
                   activeclassname="active-links"
                   to="/cart"
+                  onClick={closeMobileMenu}
                   className="nav-links"
                 >
                   <span>
                     <img
                       className="icon_styles"
                       src={Cart}
-                      alt="Home"
+                      alt="Cart"
                       onClick={scrollTop}
                     />
                   </span>{" "}
@@ -112,7 +128,7 @@ const Navbar = () => {
                 className="nav-links"
               >
                 <span>
-                  <img className="icon_styles" src={Logout} alt="Home" />
+                  <img className="icon_styles" src={Logout} alt="Logout" />
                 </span>
                 Logout
               </NavLink>
@@ -122,12 +138,13 @@ const Navbar = () => {
                   activeclassname="active-links"
                   to="/signin"
                   className="nav-links"
+                  onClick={closeMobileMenu}
                 >
                   <span>
                     <img
                       className="icon_styles"
                       src={SignIn}
-                      alt="Home"
+                      alt="SignIn"
                       onClick={scrollTop}
                     />
                   </span>
